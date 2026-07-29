@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+venv/
+.venv/
+env/
+
+# MLflow
+mlruns/
+mlartifacts/
+*.mlflow
+
+# Data artifacts (regenerate with data/generate_synthetic_transactions.py)
+data/transactions.csv
+data/reference_batch.csv
+data/current_batch.csv
+
+# Models
+models/*.json
+models/*.pkl
+models/*.joblib
+*.model
+
+# Spark
+metastore_db/
+derby.log
+spark-warehouse/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Logs
+*.log

@@ -1,0 +1,89 @@
+version: "3.8"
+
+# Production-mode stack: a real Kafka + Zookeeper cluster, plus the
+# fraud-scoring consumer service consuming from it. Bring this up with:
+#
+#     docker compose up --build
+#
+# then run the producer (KAFKA_MODE=real) from another shell/container to
+# publish onto the `payment-transactions` topic, e.g.:
+#
+#     docker compose run --rm -e KAFKA_MODE=real fraud-consumer \
+#       python -m src.streaming.producer --n 50
+#
+# NOTE: not exercised in the sandbox this project was built in (no Docker
+# daemon / no live broker there) — see README "What Actually Ran" for the
+# local-simulation mode (KAFKA_MODE=local, the default) that was actually
+# run and verified end-to-end.
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    hostname: zookeeper
+    container_name: fraud-zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    hostname: kafka
+    container_name: fraud-kafka
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  kafka-topic-init:
+    image: confluentinc/cp-kafka:7.6.0
+    depends_on:
+      kafka:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic payment-transactions --partitions 3 --replication-factor 1
+        kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic fraud-scores --partitions 3 --replication-factor 1
+        echo "Topics created."
+
+  fraud-consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fraud-scoring-consumer
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      KAFKA_MODE: real
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    volumes:
+      - ./models:/app/models
+      - ./mlruns:/app/mlruns
+    restart: on-failure
+
+volumes:
+  mlruns-data:
