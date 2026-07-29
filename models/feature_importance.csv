@@ -1,0 +1,15 @@
+feature,importance
+distance_from_home_km,0.9761147765040155
+is_new_device,0.013224768809477547
+account_age_days,0.009266852289198645
+velocity_1h,0.0010994410306225735
+is_new_shipping_address,0.00029416136668583
+log_amount,0.0
+amount_zscore_by_card,0.0
+hour_of_day,0.0
+is_night,0.0
+cvv_match,0.0
+merchant_category_freq,0.0
+country_freq,0.0
+txn_count_last_24h,0.0
+amount_sum_last_24h,0.0

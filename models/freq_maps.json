@@ -1,0 +1,26 @@
+{
+  "merchant_category": {
+    "grocery": 0.19625,
+    "restaurant": 0.1575,
+    "online_retail": 0.1575,
+    "fuel": 0.135,
+    "electronics": 0.10625,
+    "travel": 0.08,
+    "entertainment": 0.065,
+    "utilities": 0.05875,
+    "jewelry": 0.02625,
+    "cash_advance": 0.0175
+  },
+  "country": {
+    "RU": 0.1125,
+    "CA": 0.11,
+    "GB": 0.1075,
+    "NG": 0.105,
+    "US": 0.1025,
+    "CN": 0.1,
+    "DE": 0.09625,
+    "BR": 0.09375,
+    "IN": 0.09375,
+    "FR": 0.07875
+  }
+}

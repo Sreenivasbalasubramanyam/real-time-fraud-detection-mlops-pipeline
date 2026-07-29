@@ -1,0 +1,20 @@
+{
+  "scoring_threshold": 0.9427011566622382,
+  "feature_columns": [
+    "log_amount",
+    "amount_zscore_by_card",
+    "distance_from_home_km",
+    "velocity_1h",
+    "account_age_days",
+    "hour_of_day",
+    "is_night",
+    "cvv_match",
+    "is_new_device",
+    "is_new_shipping_address",
+    "merchant_category_freq",
+    "country_freq",
+    "txn_count_last_24h",
+    "amount_sum_last_24h"
+  ],
+  "run_id": "4f8f62e6ae684eef8a3f47f1990a85a2"
+}
